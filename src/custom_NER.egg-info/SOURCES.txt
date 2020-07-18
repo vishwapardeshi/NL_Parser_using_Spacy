@@ -1,0 +1,10 @@
+README.md
+setup.py
+src/custom_NER.egg-info/PKG-INFO
+src/custom_NER.egg-info/SOURCES.txt
+src/custom_NER.egg-info/dependency_links.txt
+src/custom_NER.egg-info/requires.txt
+src/custom_NER.egg-info/top_level.txt
+src/data/__init__.py
+src/data/process_data.py
+src/data/scrape_recipes.py
