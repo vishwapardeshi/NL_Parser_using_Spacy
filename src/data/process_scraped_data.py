@@ -1,6 +1,7 @@
 import unicodedata
-unicodedata.numeric(u'⅕')
-unicodedata.name(u'⅕')
+import sys
+import os
+import pandas as pd
 
 def load_data(dir_path, test_data_filepath):
     """
@@ -8,19 +9,19 @@ def load_data(dir_path, test_data_filepath):
     Args:
         test_data_filepath: the path of the test_data.csv file which is used for testing
     Returns:
-        test_df (DataFrame): Dataframe containing annonated data
+        df (DataFrame): Dataframe containing annonated data
     """
     #load data
-    test_df = pd.read_csv(os.path.join(dir_path,train_data_filepath))
-    return test_df
+    df = pd.read_csv(os.path.join(dir_path,test_data_filepath))
+    return df
 
 def convert_vulgar_to_mixed_fraction(df):
     #convert vulgar fractions
     for ix, row in df.iterrows():
-        for char in row['ingredient']:
+        for char in row['ingredient']:#.decode('utf-8').strip():
             if unicodedata.name(char).startswith('VULGAR FRACTION'):
                 normalized = unicodedata.normalize('NFKC', char)
-                    df.iloc[ix, 2] = df.iloc[ix, 2].replace(char, normalized)
+                df.iloc[ix, 2] = df.iloc[ix, 2].replace(char, normalized)
     return(df)
 
 def save_data(df, filepath):
@@ -52,7 +53,7 @@ def main():
 
         print('Saving final test data...\n    CSV: {}'
             .format(os.path.join(proc_data_path, final_filename )))
-        save_data(test_df, proc_data_path, final_filename )
+        save_data(test_df, os.path.join(proc_data_path, final_filename + '.csv' )  )
 
     else:
         print('Please provide the directory path of data folder'\

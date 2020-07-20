@@ -66,7 +66,7 @@ class Crawler():
             return ingredient_list
         for ul in content:
           for li in ul.findAll('li', attrs):
-            ingredient = li.find("span").text.strip() #basic stripping to eliminate whitespaces
+            ingredient = li.find("span").text.encode('utf-8').strip() #basic stripping to eliminate whitespaces
             if ingredient != "Add all ingredients to list": #sometimes this is read in too
               ingredient_list.append(ingredient)
         return(ingredient_list)
@@ -94,7 +94,10 @@ class Crawler():
         :Returns:
             :None: Does not return anything but saves the csv file
         """
-        df.to_csv(filepath)
+        if os.path.isfile(filepath):
+            df.to_csv(filepath, mode='a', header=False)
+        else:
+            df.to_csv(filepath, index = False, header = True)
 
 def main():
     if len(sys.argv) == 4:
@@ -113,7 +116,7 @@ def main():
 
         print('Saving data...\n    DATABASE: {}'.format(os.path.join(dir_path, filepath + '.csv')))
         df = crawler.convert_to_dataframe(recipe_list)
-        
+        print(df)
         crawler.save_data(df, os.path.join(dir_path, filepath + '.csv'))
 
         print('Cleaned data saved to database!')

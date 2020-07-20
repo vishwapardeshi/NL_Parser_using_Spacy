@@ -2,6 +2,9 @@ import sys
 import pandas as pd
 import numpy as np
 import pickle
+import spacy
+
+import random
 
 def load_data(train_filepath):
     """
@@ -15,14 +18,43 @@ def load_data(train_filepath):
     """
 
     # load data from database
-    engine = create_engine('sqlite:///../data/DisasterResponse.db')
-    df = pd.read_sql_table('DisasterResponse', engine)
-    X = df['message']
-    Y = df.drop(['id', 'message', 'original', 'genre'], axis=1)
-    category_names = Y.columns
+    train_data = []
+    with open(train_filepath) as f:
+        content = f.read().splitlines()
+        train_data = [eval(c) for c in content]
+    return trim_entity_spans(train_data)
 
-    return train_data
+import re
 
+
+def trim_entity_spans(data):
+    """Removes leading and trailing white spaces from entity spans.
+
+    Args:
+        data (list): The data to be cleaned in spaCy JSON format.
+
+    Returns:
+        list: The cleaned data.
+    """
+    invalid_span_tokens = re.compile(r'\s')
+
+    cleaned_data = []
+    for text, annotations in data:
+        entities = annotations['entities']
+        valid_entities = []
+        for start, end, label in entities:
+            valid_start = start
+            valid_end = end
+            while valid_start < len(text) and invalid_span_tokens.match(
+                    text[valid_start]):
+                valid_start += 1
+            while valid_end > 1 and invalid_span_tokens.match(
+                    text[valid_end - 1]):
+                valid_end -= 1
+            valid_entities.append([valid_start, valid_end, label])
+        cleaned_data.append([text, {'entities': valid_entities}])
+
+    return cleaned_data
 
 def build_model():
     """
@@ -34,38 +66,37 @@ def build_model():
         cross validated classifier object
     """
 
-    nlp = spacy.load('en_core_web_sm')
-    ner = nlp.get_pipe("ner")
-    if 'ner' not in nlp.pipe_names:
-        ner = nlp.create_pipe('ner')
-        nlp.add_pipe(ner, last=True)
-        
-    return nlp
+    custom_ner = spacy.load('en_core_web_sm')
+    ner_pipe = custom_ner.get_pipe("ner")
+    if 'ner' not in custom_ner.pipe_names:
+        ner_pipe = custom_ner.create_pipe('ner')
+        custom_ner.add_pipe(ner_pipe, last=True)
 
-def fit(model, train_data, iterations):
-    TRAIN_DATA = data
+    return (custom_ner, ner_pipe)
+
+def fit(model, ner_pipe,  train_data, iterations):
 
     # add labels
-    for _, annotations in TRAIN_DATA:
+    for _, annotations in train_data:
          for ent in annotations.get('entities'):
-            ner.add_label(ent[2])
+            ner_pipe.add_label(ent[2])
     # get names of other pipes to disable them during training
-    other_pipes = [pipe for pipe in nlp.pipe_names if pipe != 'ner']
-    with nlp.disable_pipes(*other_pipes):  # only train NER
-        optimizer = nlp.begin_training()
-        for itn in range(iterations):
-            print("Statring iteration " + str(itn))
-            random.shuffle(TRAIN_DATA)
+    other_pipes = [pipe for pipe in model.pipe_names if pipe != 'ner']
+    with model.disable_pipes(*other_pipes):  # only train NER
+        optimizer = model.begin_training()
+        for iteration in range(iterations):
+            print("Statring iteration " + str(iteration))
+            random.shuffle(train_data)
             losses = {}
-            for text, annotations in TRAIN_DATA:
-                nlp.update(
+            for text, annotations in train_data:
+                model.update(
                     [text],  # batch of texts
                     [annotations],  # batch of annotations
                     drop=0.2,  # dropout - make it harder to memorise data
                     sgd=optimizer,  # callable to update weights
                     losses=losses)
             print(losses)
-    return nlp
+    return model
 
 
 
@@ -78,22 +109,20 @@ def save_model(model, model_filepath):
 
 def main():
     if len(sys.argv) == 3:
-        database_filepath, model_filepath = sys.argv[1:]
-        print('Loading data...\n    DATABASE: {}'.format(database_filepath))
-        X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        data_filepath, model_filepath = sys.argv[1:]
+        print('Loading data...\n    TRAIN_DATA: {}'.format(data_filepath))
+        train_data = load_data(data_filepath)
+        print(train_data[:5])
 
         print('Building model...')
-        model = build_model()
+        ner_model, ner_pipe = build_model()
 
         print('Training model...')
-        model.fit(X_train, Y_train)
+        fit(ner_model, ner_pipe, train_data, 25)
 
-        print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
-        save_model(model, model_filepath)
+        save_model(ner_model, model_filepath)
 
         print('Trained model saved!')
 

@@ -88,10 +88,12 @@ def transform_to_entity_map(line, ingredient_list, entity):
         ingd_regex = re.compile(ingredient_list[i])
         entity_match = ingd_regex.search(line)
         if entity_match:
+            element = (entity_match.start(), entity_match.end(), entity)
             if i == 0:
-              curr_dict['entities'] = [(entity_match.start(), entity_match.end(), entity)]
-            else:
-              curr_dict['entities'].append((entity_match.start(), entity_match.end(), entity))
+              curr_dict['entities'] = [element]
+            elif element not in curr_dict['entities']:
+                
+              curr_dict['entities'].append(element)
     return(curr_dict['entities'])
 
 
