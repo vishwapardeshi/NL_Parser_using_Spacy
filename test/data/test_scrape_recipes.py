@@ -3,36 +3,38 @@ import numpy as np
 import pytest
 import sys
 
-from data.scrape_recipes import get_links, get_ingredients, get_each_recipe
+from data.scrape_recipes import Crawler
+
 
 class TestGetLinks(object):
+    crawler = Crawler('https://www.allrecipes.com/recipes/?page=')
     def test_valueerror_on_negative_recipe_number(self):
         with pytest.raises(ValueError) as exc_info:
-            get_recipe_links(-1)
-        expected_error_msg = "The number of pages scraped should be more than 0.\
-        Got non-positive number instead!"
+            self.crawler.get_links(-1)
+        expected_error_msg = "The number of pages scraped should be more than 0. Got non-positive number instead!"
         assert exc_info.match(expected_error_msg)
 
-    def test_valuerror_on_non_integer_recipe_number(self):
+    def test_valueerror_on_incorrect_data_type(self):
         with pytest.raises(ValueError) as exc_info:
-            get_recipe_links(0.2)
-        expected_error_msg = "The number of pages scraped should be a positive integer.\
-        Got decimal instead!"
+            self.crawler.get_links(2.2)
+        expected_error_msg = "The number of pages scraped should be a positive integer. Got decimal instead!"
         assert exc_info.match(expected_error_msg)
 
-    def test_empty_list(self):
-        pass
-    def test_expected(self):
-        pass
+    def test_on_one_page(self):
+        actual_len = len(self.crawler.get_links(1))
+        assert actual_len > 0, "Expected length: > 0, Actual length: {0}".format(actual_len)
+
 
 class TestGetIngredients(object):
     def test_valueerror_on_incorrect_version(self):
-
         pass
 
+class TestContent(object):
+    def test_incorrect_version(self):
+        pass
 
-    def test_
-
-class TestGetEachRecipe(object):
-    def test_empty_list(self):
+class TestConvertToDataFrame(object):
+    def test_column_name(self):
+        pass
+    def test_incomplete_recipe_list(self):
         pass

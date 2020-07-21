@@ -15,6 +15,7 @@ def load_data(dir_path, train_data_filepath):
         train_df (DataFrame): Dataframe containing annonated data
     """
     #load data
+
     train_df = pd.read_csv(os.path.join(dir_path,train_data_filepath))
     return train_df
 
@@ -41,7 +42,7 @@ def clean_data(train_df, stopwords_filepath):
     cleaned_ingredient = []
     for _, row in train_df.iterrows():
       #remove text within parantheses along with the parantheses
-      row['ingredient_name'] = re.sub("[\(\[].*?[\)\]]", "", row['ingredient_name'])
+      row['ingredient_name'] = re.sub(r"[\(\[].*?[\)\]]", "", row['ingredient_name'])
       row['ingredient_name'] = row['ingredient_name'].replace("-", "")
       curr_row =  row['ingredient_name'].split()
       if len(curr_row) > 1:
@@ -92,7 +93,7 @@ def transform_to_entity_map(line, ingredient_list, entity):
             if i == 0:
               curr_dict['entities'] = [element]
             elif element not in curr_dict['entities']:
-                
+
               curr_dict['entities'].append(element)
     return(curr_dict['entities'])
 
@@ -111,8 +112,6 @@ def generate_structured_train_data(clean_data_path, final_filename):
           continue
       ingd_list = str(ingd_name).split()
       flag = 0
-      print(line)
-      print(ingd_list)
       #for each token
       for ingredient in ingd_list:
         if line == 'nan' or ingredient == 'nan':

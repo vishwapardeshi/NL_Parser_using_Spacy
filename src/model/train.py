@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import pickle
 import spacy
+import joblib
+import os
 
 import random
 
@@ -85,7 +87,7 @@ def fit(model, ner_pipe,  train_data, iterations):
     with model.disable_pipes(*other_pipes):  # only train NER
         optimizer = model.begin_training()
         for iteration in range(iterations):
-            print("Statring iteration " + str(iteration))
+            print("Starting iteration " + str(iteration))
             random.shuffle(train_data)
             losses = {}
             for text, annotations in train_data:
@@ -104,7 +106,7 @@ def save_model(model, model_filepath):
     """
         Save model to pickle
     """
-    joblib.dump(model, open(model_filepath, 'wb'))
+    joblib.dump(model, open(os.path.join(model_filepath , 'ner_model.pkl'), 'wb'))
 
 
 def main():
@@ -118,7 +120,7 @@ def main():
         ner_model, ner_pipe = build_model()
 
         print('Training model...')
-        fit(ner_model, ner_pipe, train_data, 25)
+        fit(ner_model, ner_pipe, train_data, 1)
 
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))

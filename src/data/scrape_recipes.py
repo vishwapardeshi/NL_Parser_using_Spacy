@@ -16,20 +16,18 @@ class Crawler():
 
     def get_links(self, num_pages):
         if num_pages <= 0:
-            raise ValueError("The number of pages scraped should be more than 0.\
-            Got non-positive number instead!")
+            raise ValueError("The number of pages scraped should be more than 0. Got non-positive number instead!")
 
         if not isinstance(num_pages, int):
-            raise ValueError("The number of pages scraped should be a positive integer.\
-            Got decimal instead!")
+            raise ValueError("The number of pages scraped should be a positive integer. Got decimal instead!")
 
         recipe_list = []
-        for page in range(1, int(num_pages)):
+        for page in range(1, int(num_pages) + 1):
             r = requests.get(self.base_url + str(page))
             html = BeautifulSoup(r.content, 'html.parser')
             num_recipes = 0
             for recipe in html.findAll('article', {'class' : 'fixed-recipe-card'}):
-                link = recipe.find("a", attrs={'href': re.compile("^https://www.allrecipes.com/recipe")})
+                link = recipe.find("a", attrs={'href': re.compile(r"^https://www.allrecipes.com/recipe")})
                 name = recipe.find('span', {"class":"fixed-recipe-card__title-link"}).text
                 recipe_list.append({"name" : name, "url" : link['href']})
                 num_recipes += 1
@@ -114,17 +112,16 @@ def main():
         print('Cleaning data...')
         recipe_list = crawler.get_content(recipe_link_list)
 
-        print('Saving data...\n    DATABASE: {}'.format(os.path.join(dir_path, filepath + '.csv')))
+        print('Saving data...\n    CSV: {}'.format(os.path.join(dir_path, filepath + '.csv')))
         df = crawler.convert_to_dataframe(recipe_list)
-        print(df)
+
         crawler.save_data(df, os.path.join(dir_path, filepath + '.csv'))
 
-        print('Cleaned data saved to database!')
+        print('Cleaned data saved to csv file!')
     else:
-        print("'Please provide the filepaths of the messages and categories '\
-              'datasets as the first and second argument respectively, as '\
-              'well as the filepath of the database to save the cleaned data '\
-              'to as the third argument. \n\nExample: python process_data.py '\
+        print("'Please provide the number of webpages to scrape and\
+        directory and filename of the csv file to save the scraped data\
+         \n\nExample: python process_data.py '\
               'disaster_messages.csv disaster_categories.csv '\
               'DisasterResponse.db'")
 
