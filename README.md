@@ -1,1 +1,1 @@
-# Custom_NER_Recipe_Ingredient_Parser
+# Natural Language Recipe Ingredient Parser using SpaCy
