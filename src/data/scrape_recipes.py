@@ -11,8 +11,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 class Crawler():
-    def __init__(self, base_url):
-        self.base_url = base_url
+    def __init__(self):
+        self.base_url = 'https://www.allrecipes.com/recipes/?page='
 
     def get_links(self, num_pages):
         if num_pages <= 0:
@@ -70,6 +70,8 @@ class Crawler():
         return(ingredient_list)
 
     def convert_to_dataframe(self, recipe_list):
+        if len(recipe_list[0]) < 3:
+            return pd.DataFrame(columns = ['url', 'name', 'ingredient'])
 
         base_df = pd.DataFrame(recipe_list)
         ingredient = base_df.apply(lambda x: pd.Series(x['ingredients']), axis=1).stack().reset_index(level=1, drop=True)
@@ -78,8 +80,6 @@ class Crawler():
         recipes_df['ingredient'] = pd.Series(recipes_df['ingredient'], dtype=object)
         recipes_df.reset_index(inplace = True,drop='index')
         recipes_df = recipes_df[['url', 'name', 'ingredient']]
-        print(recipes_df)
-
         return recipes_df
 
     def save_data(self, df, filepath):
@@ -105,7 +105,7 @@ def main():
         print('Scraping website for recipe link...\n    Pages: {}'
               .format(num_pages))
 
-        crawler = Crawler("https://www.allrecipes.com/recipes/?page=")
+        crawler = Crawler()
         #print(crawler)
         recipe_link_list = crawler.get_links(int(num_pages))
 

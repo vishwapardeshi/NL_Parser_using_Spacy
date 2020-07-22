@@ -15,9 +15,11 @@ def load_data(dir_path, train_data_filepath):
         train_df (DataFrame): Dataframe containing annonated data
     """
     #load data
-
-    train_df = pd.read_csv(os.path.join(dir_path,train_data_filepath))
-    return train_df
+    if not os.path.isfile(os.path.join(dir_path, train_data_filepath)):
+        raise FileNotFoundError("This file doesn't exist")
+    else:
+        train_df = pd.read_csv(os.path.join(dir_path,train_data_filepath))
+        return train_df
 
 def clean_data(train_df, stopwords_filepath):
     """
@@ -76,6 +78,8 @@ def save_data(train_df, dir_path, clean_filename):
 
 
 def transform_to_entity_map(line, ingredient_list, entity):
+    if entity != "INGREDIENT":
+        raise ValueError("The entity type is limited to only INGREDIENT. Got {}!".format(entity))
     curr_dict = {}
     if len(ingredient_list) == 0:
         return []

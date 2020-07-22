@@ -12,10 +12,15 @@ def load_data(dir_path, test_data_filepath):
         df (DataFrame): Dataframe containing annonated data
     """
     #load data
-    df = pd.read_csv(os.path.join(dir_path,test_data_filepath))
-    return df
+    if not os.path.isfile(os.path.join(dir_path, test_data_filepath)):
+        raise FileNotFoundError("This file doesn't exist")
+    else:
+        df = pd.read_csv(os.path.join(dir_path,test_data_filepath))
+        return df
 
 def convert_vulgar_to_mixed_fraction(df):
+    if 'ingredient' not in df.columns:
+        raise ValueError("The dataframe should have 3 columns - url, name, ingredient. Found {0}".format(df.columns))
     #convert vulgar fractions
     for ix, row in df.iterrows():
         for char in row['ingredient']:#.decode('utf-8').strip():
