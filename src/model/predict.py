@@ -11,11 +11,9 @@ def load_data(test_filepath):
     """
         Load data from csv file.
     Args:
-        database_filepath: the path of the database file
+        test_filepath: the path of the test data csv file
     Returns:
-        X (DataFrame): messages
-        Y (DataFrame): One-hot encoded categories
-        category_names (List)
+        df: DataFrame containing test data
     """
 
     # load data from database
@@ -26,17 +24,25 @@ def load_data(test_filepath):
     return(df)
 
 def load_model(model_filepath):
-    return joblib.load(model_filepath)
+    """
+        Load trained model.
+    Args:
+        model_filepath: the path of the model pkl file
+    Returns:
+        model: Returns trained model
+    """
+    model = joblib.load(model_filepath)
+    return model
 
 
 def predict(df, model_filepath):
     """
-      build NLP pipeline - count words, tf-idf, multiple output classifier,
-      grid search the best parameters
+      Extract ingredient name from description using custom named entity recognition model
     Args:
-        None
+        df: test data DataFrame
+        model_filepath: the path of the trained model pkl file
     Returns:
-        cross validated classifier object
+        clean_ingredients: list containing extracted entities
     """
     #
     ner_model = load_model(model_filepath)
@@ -62,10 +68,19 @@ def predict(df, model_filepath):
 
 
 def save_data(df, predicted_values, filepath):
-        #convert to a new dataframe
-        df = df[['url', 'name']]
-        df['ingredient'] = predicted_values
-        df.to_csv(filepath)
+    """
+      Save the predicted/extracted values
+    Args:
+        df: test data DataFrame
+        predicted_values: values generated using the trained model on the test data
+        filepath: the path where the predicted values are to be stored
+    Returns:
+        None: Returns none but saves the csv to the filepath
+    """
+    #convert to a new dataframe
+    df = df[['url', 'name']]
+    df['ingredient'] = predicted_values
+    df.to_csv(filepath)
 
 def main():
     if len(sys.argv) == 5:
@@ -81,10 +96,10 @@ def main():
 
 
     else:
-        print('Please provide the filepath of the disaster messages database '\
-              'as the first argument and the filepath of the pickle file to '\
-              'save the model to as the second argument. \n\nExample: python '\
-              'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
+        print('Please provide the filepath of the model & test data '\
+              'and name of the test_file and the predicted_file name by which to '\
+              'store the results. \n\nExample: python3 '\
+              'predict.py model/model.pkl data/processed final_test_data predicted_test')
 
 
 if __name__ == '__main__':

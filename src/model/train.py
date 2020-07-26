@@ -5,6 +5,7 @@ import pickle
 import spacy
 import joblib
 import os
+import re
 
 import random
 
@@ -12,29 +13,21 @@ def load_data(train_filepath):
     """
         Load data from csv file.
     Args:
-        database_filepath: the path of the database file
+        train_filepath: the path of the database file
     Returns:
-        X (DataFrame): messages
-        Y (DataFrame): One-hot encoded categories
-        category_names (List)
+        train_data: list contained train data for spaCy model.
     """
-
-    # load data from database
+    # load data from csv
     train_data = []
     with open(train_filepath) as f:
         content = f.read().splitlines()
         train_data = [eval(c) for c in content]
     return trim_entity_spans(train_data)
 
-import re
-
-
 def trim_entity_spans(data):
     """Removes leading and trailing white spaces from entity spans.
-
     Args:
         data (list): The data to be cleaned in spaCy JSON format.
-
     Returns:
         list: The cleaned data.
     """
@@ -60,12 +53,11 @@ def trim_entity_spans(data):
 
 def build_model():
     """
-      build NLP pipeline - count words, tf-idf, multiple output classifier,
-      grid search the best parameters
+      build custom named entity recognition model using spaCy
     Args:
         None
     Returns:
-        cross validated classifier object
+        custom model and ner pipe
     """
 
     custom_ner = spacy.load('en_core_web_sm')
@@ -77,7 +69,16 @@ def build_model():
     return (custom_ner, ner_pipe)
 
 def fit(model, ner_pipe,  train_data, iterations):
-
+    """
+      Fit the spaCy model to the training data
+    Args:
+        model: model built using  `build_model`
+        ner_pipe: ner pipe of the model from `build_model`
+        train_data: list containing training data
+        iterations: Number of iterations for which to train the model
+    Returns:
+        model: Returns trained model
+    """
     # add labels
     for _, annotations in train_data:
          for ent in annotations.get('entities'):
@@ -100,11 +101,14 @@ def fit(model, ner_pipe,  train_data, iterations):
             print(losses)
     return model
 
-
-
 def save_model(model, model_filepath):
     """
-        Save model to pickle
+        Save model to pickle at the filepath specified
+    Args:
+        model: Trained model
+        model_filepath: Filepath to which model will be saved
+    Returns:
+        None: saves the model to the specificed path
     """
     joblib.dump(model, open(os.path.join(model_filepath , 'ner_model.pkl'), 'wb'))
 
@@ -129,11 +133,9 @@ def main():
         print('Trained model saved!')
 
     else:
-        print('Please provide the filepath of the disaster messages database '\
-              'as the first argument and the filepath of the pickle file to '\
-              'save the model to as the second argument. \n\nExample: python '\
-              'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
-
+        print('Please provide the filepath of the training data &'\
+              'filepath of the pickle file to save the model to as the second argument.'\
+              '\n\nExample: python3 train.py ../data/processed ../models')
 
 if __name__ == '__main__':
     main()

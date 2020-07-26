@@ -10,6 +10,7 @@ def load_data(dir_path, train_data_filepath):
     """
         Load training data from the csv.
     Args:
+        dir_path: the directory containing train data
         train_data_filepath: the path of the ny_times_recipe.csv file which is used for training
     Returns:
         train_df (DataFrame): Dataframe containing annonated data
@@ -25,10 +26,11 @@ def clean_data(train_df, stopwords_filepath):
     """
     Takes loaded data frame from `load_data` and cleans it for use.
 
-    :Input:
-        :train_df: Data frame created from `load_data`
-    :Returns:
-        :train_df: Cleaned data frame.
+    Args
+        train_df: Data frame created from `load_data`
+        stopwords_filepath: the path of stopwords.txt
+    Returns:
+        train_df: Cleaned data frame.
     """
     #convert input and name to string
     train_df['input'] = train_df['input'].astype(str)
@@ -65,19 +67,30 @@ def clean_data(train_df, stopwords_filepath):
 
 def save_data(train_df, dir_path, clean_filename):
     """
-    Takes clean dataframe from `clean_data` and saves it inside of an SQLite database with a desired filename.
+    Takes clean dataframe from `clean_data` and saves it as a csv file
 
-    :Input:
-        :train_df: Clean data frame from `clean_data`
-        :clean_filename: String, csv file name
-    :Returns:
-        :None: Does not return anything but saves the csv file
+    Args
+        train_df: Clean data frame from `clean_data`
+        clean_filename: String, csv file name
+    Returns:
+        None: Does not return anything but saves the csv file
     """
     filename = os.path.join(dir_path, clean_filename + ".csv")
     train_df.to_csv(filename, index = False, header = True)
 
 
 def transform_to_entity_map(line, ingredient_list, entity):
+    """
+    Takes ingredient description and converts it into an entity map
+
+    Args
+        line: String containing ingredient description
+        ingredient_list: list of ingredient's present in line
+        entity: String containing name of entity to be extracted; here ingredient
+    Returns:
+        curr_dict['entities']: returns data in spacy training data format for one line of ingredient
+    """
+
     if entity != "INGREDIENT":
         raise ValueError("The entity type is limited to only INGREDIENT. Got {}!".format(entity))
     curr_dict = {}
@@ -103,6 +116,16 @@ def transform_to_entity_map(line, ingredient_list, entity):
 
 
 def generate_structured_train_data(clean_data_path, final_filename):
+    """
+    Generates and saves training data in format required for spacy NER model
+
+    Args
+        clean_data_path: filepath of the cleaned dataframe containing annonated data
+        final_filename: file name to which the training data will be saved to
+    Returns:
+        train_data: returns list containing training_data formatted for spacy NER model
+    """
+
     entity = 'INGREDIENT'
     #load the clean datasets
     df = pd.read_csv(clean_data_path)
@@ -148,7 +171,7 @@ def main():
         proc_data_path = os.path.join(data_path, 'processed')
 
         print('Loading data...\n    EXTERNAL DATA: {}'
-              .format(external_data_path))
+              .format(external_data_path, 'ny_times_recipe.csv'))
         train_df = load_data(external_data_path, 'ny_times_recipe.csv')
 
         print('Cleaning data...')

@@ -7,6 +7,7 @@ def load_data(dir_path, test_data_filepath):
     """
         Load testing data from the csv.
     Args:
+        dir_path: directory of the test data
         test_data_filepath: the path of the test_data.csv file which is used for testing
     Returns:
         df (DataFrame): Dataframe containing annonated data
@@ -19,6 +20,13 @@ def load_data(dir_path, test_data_filepath):
         return df
 
 def convert_vulgar_to_mixed_fraction(df):
+    """
+        Converts unicode vulgar fraction to mixed fraction
+    Args:
+        df: df that needs to be cleaned
+    Returns:
+        df (DataFrame): Dataframe containing clean data
+    """
     if 'ingredient' not in df.columns:
         raise ValueError("The dataframe should have 3 columns - url, name, ingredient. Found {0}".format(df.columns))
     #convert vulgar fractions
@@ -31,14 +39,14 @@ def convert_vulgar_to_mixed_fraction(df):
 
 def save_data(df, filepath):
     """
-    Takes clean dataframe from `clean_data` and saves it inside of an SQLite database with a desired filename.
-
-    :Input:
-        :train_df: Clean data frame from `clean_data`
-        :clean_filename: String, csv file name
-    :Returns:
-        :None: Does not return anything but saves the csv file
+    Takes clean dataframe from `convert_vulgar_to_mixed_fraction` and saves it in csv
+    Args:
+        df: df that needs to be cleaned
+        filepath: filepath of the location where the test_data is to be saved
+    Returns:
+        None: Does not return anything but saves the csv file
     """
+    
     df.to_csv(filepath, index = False, header = True)
 
 def main():
