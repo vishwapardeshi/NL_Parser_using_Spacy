@@ -17,7 +17,7 @@ This natural language recipe ingredient parser can be used by food blogging webs
 
 ## Methodology
 
-As this is an end-to-end NLP project, it covers everything from acquiring data, building ELT pipelines and custom Named Entity Recognition model using Test-Driven Development Methodoly. The unit tests can be found in the test folder which uses pyTest. 
+As this is an end-to-end NLP project, it covers everything from acquiring data, building ELT pipelines and custom Named Entity Recognition model using Test-Driven Development Methodoly. **The unit tests can be found in the test folder which uses pyTest.** 
 
 1. Scrape Recipes from webpages using BeautifulSoup
 
@@ -35,5 +35,6 @@ In addition to this, I also explored dependency parsing to extract ingredients f
 ## Tools 
 > 1. Web scraping: Python, BeautifulSoup, Requests, re(regular expression), pandas
 > 2. ELT Pipeline: Python, Pandas, BeautifulSoup
-> 3. Named Entity Recongition: spaCy
-> 4. Exploration: JupyterNotebooks
+> 3. Unit Testing: pyTest, TravisCI
+> 4. Named Entity Recongition: spaCy
+> 5. Exploration: JupyterNotebooks
