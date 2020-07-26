@@ -4,6 +4,8 @@
 
 Recipes on almost all food-blogging or recipe curating website never separate the name of the ingredient from the measurement, quantity and additional description. Thus, to simply scrape the ingredient name from a recipe's webpage is not possible without some text processing. This project is an **end-to-end NLP project which scrapes webpages for recipes and extracts ingredient name from recipes using Custom Named Entity Recognition (spaCy).**
 
+I used Test-Driven Development methodology.
+
 ## Outline
 
 This natural language recipe ingredient parser can be used by food blogging website or apps likewise to improve management of opaque ingredients by converting into easy to manipulate & exploit strings stored in tabular format. Thus, it can be used for 
