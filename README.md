@@ -35,8 +35,10 @@ In addition to this, I also explored dependency parsing to extract ingredients f
 
 
 ## Tools 
+```
 > 1. Web scraping: Python, BeautifulSoup, Requests, re(regular expression), pandas
 > 2. ELT Pipeline: Python, Pandas, BeautifulSoup
 > 3. Unit Testing: pyTest, TravisCI
 > 4. Named Entity Recongition: spaCy
 > 5. Exploration: JupyterNotebooks
+```
