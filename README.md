@@ -1,6 +1,6 @@
 # Natural Language Recipe Ingredient Parser using SpaCy
 
-![Build Status](https://travis-ci.com/vishwapardeshi/Custom_NER_Recipe_Ingredient_Parser.svg?branch=master)
+![Build Status](https://travis-ci.com/vishwapardeshi/NL_Parser_using_Spacy.svg?branch=master)
 
 Recipes on almost all food-blogging or recipe curating website never separate the name of the ingredient from the measurement, quantity and additional description. Thus, to simply scrape the ingredient name from a recipe's webpage is not possible without some text processing. This project is an **end-to-end NLP project which scrapes webpages for recipes and extracts ingredient name from recipes using Custom Named Entity Recognition (spaCy).**
 
