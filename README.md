@@ -1,4 +1,4 @@
-# Natural Language Recipe Ingredient Parser using SpaCy
+# Natural Language Parser using SpaCy
 
 ![Build Status](https://travis-ci.com/vishwapardeshi/NL_Parser_using_Spacy.svg?branch=master)
 
