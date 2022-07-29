@@ -38,7 +38,7 @@ kiwisolver==1.2.0
 lxml==4.5.2
 MarkupSafe==1.1.1
 matplotlib==3.3.0
-mistune==0.8.4
+mistune==2.0.3
 more-itertools==8.4.0
 murmurhash==1.0.2
 nbconvert==5.6.1
